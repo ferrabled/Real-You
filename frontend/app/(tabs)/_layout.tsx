@@ -1,10 +1,10 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
-import { View, TouchableOpacity, StyleSheet } from 'react-native';
+import { Tabs } from "expo-router";
+import React from "react";
+import { View, TouchableOpacity, StyleSheet } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
-import { TabBarIcon } from '@/components/navigation/TabBarIcon';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
+import { Colors } from "@/constants/Colors";
+import { useColorScheme } from "@/hooks/useColorScheme";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -12,27 +12,33 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
         headerShown: false,
         tabBarStyle: styles.tabBar,
-      }}>
+        tabBarShowLabel: false, // Hide labels for a more minimal look
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
+          title: "Home",
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'home' : 'home-outline'} color={color} />
+            <Ionicons
+              name={focused ? "home" : "home-outline"}
+              size={24}
+              color={color}
+            />
           ),
         }}
       />
       <Tabs.Screen
         name="camera"
         options={{
-          title: '',
-          tabBarIcon: ({ color }) => (
+          title: "",
+          tabBarButton: ({ onPress }) => (
             <View style={styles.cameraButtonContainer}>
-              <TouchableOpacity style={styles.cameraButton}>
-                <TabBarIcon name="camera" color={color} size={35} />
+              <TouchableOpacity style={styles.cameraButton} onPress={onPress}>
+                <Ionicons name="camera" color="white" size={30} />
               </TouchableOpacity>
             </View>
           ),
@@ -41,9 +47,13 @@ export default function TabLayout() {
       <Tabs.Screen
         name="account"
         options={{
-          title: 'Account',
+          title: "Account",
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'person' : 'person-outline'} color={color} />
+            <Ionicons
+              name={focused ? "person" : "person-outline"}
+              size={24}
+              color={color}
+            />
           ),
         }}
       />
@@ -55,21 +65,31 @@ const styles = StyleSheet.create({
   tabBar: {
     height: 60,
     paddingBottom: 5,
+    paddingTop: 5,
+    backgroundColor: "white", // Or use Colors[colorScheme].background for theme support
+    borderTopWidth: 0, // Remove top border for a cleaner look
+    elevation: 8, // Add shadow on Android
+    shadowColor: "#000", // Add shadow on iOS
+    shadowOffset: {
+      width: 0,
+      height: -4,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
   cameraButtonContainer: {
-    position: 'absolute',
-    bottom: 0,
-    alignSelf: 'center',
-    justifyContent: 'center',
-    alignItems: 'center',
+    top: -30,
+    alignSelf: "center",
+    justifyContent: "center",
+    alignItems: "center",
   },
   cameraButton: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 90,
+    height: 90,
+    borderRadius: 35,
     backgroundColor: Colors.light.tint,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
