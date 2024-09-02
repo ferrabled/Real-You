@@ -37,6 +37,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Send messages
     for (const address of subscribedAddresses) {
       try {
+        //TODO: Add consentProof to the conversation
         const conversation = await client.conversations.newConversation(address);
         await conversation.send(message);
         console.log(`Sent message to: ${address}`);
