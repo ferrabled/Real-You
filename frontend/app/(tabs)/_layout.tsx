@@ -5,59 +5,62 @@ import { Ionicons } from "@expo/vector-icons";
 
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { Web3AuthWrapper } from "@/components/web3Auth/Web3AuthWrapper";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
 
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
-        headerShown: false,
-        tabBarStyle: styles.tabBar,
-        tabBarShowLabel: false, // Hide labels for a more minimal look
-      }}
-    >
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: "Home",
-          tabBarIcon: ({ color, focused }) => (
-            <Ionicons
-              name={focused ? "home" : "home-outline"}
-              size={24}
-              color={color}
-            />
-          ),
+    <Web3AuthWrapper>
+      <Tabs
+        screenOptions={{
+          tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
+          headerShown: false,
+          tabBarStyle: styles.tabBar,
+          tabBarShowLabel: false, // Hide labels for a more minimal look
         }}
-      />
-      <Tabs.Screen
-        name="camera"
-        options={{
-          title: "",
-          tabBarButton: ({ onPress }) => (
-            <View style={styles.cameraButtonContainer}>
-              <TouchableOpacity style={styles.cameraButton} onPress={onPress}>
-                <Ionicons name="camera" color="white" size={30} />
-              </TouchableOpacity>
-            </View>
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="account"
-        options={{
-          title: "Account",
-          tabBarIcon: ({ color, focused }) => (
-            <Ionicons
-              name={focused ? "person" : "person-outline"}
-              size={24}
-              color={color}
-            />
-          ),
-        }}
-      />
-    </Tabs>
+      >
+        <Tabs.Screen
+          name="index"
+          options={{
+            title: "Home",
+            tabBarIcon: ({ color, focused }) => (
+              <Ionicons
+                name={focused ? "home" : "home-outline"}
+                size={24}
+                color={color}
+              />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="camera"
+          options={{
+            title: "",
+            tabBarButton: ({ onPress }) => (
+              <View style={styles.cameraButtonContainer}>
+                <TouchableOpacity style={styles.cameraButton} onPress={onPress}>
+                  <Ionicons name="camera" color="white" size={30} />
+                </TouchableOpacity>
+              </View>
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="account"
+          options={{
+            title: "Account",
+            tabBarIcon: ({ color, focused }) => (
+              <Ionicons
+                name={focused ? "person" : "person-outline"}
+                size={24}
+                color={color}
+              />
+            ),
+          }}
+        />
+      </Tabs>
+    </Web3AuthWrapper>
   );
 }
 
