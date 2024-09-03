@@ -57,7 +57,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       try {
         const conversation = await client.conversations.newConversation(
           address,
-          undefined,
+          { conversationId: "RealYou Updates", metadata: {} },
           { signature, timestamp: Long.fromString(currentTime), payloadVersion: 1 }
         );
         await conversation.send(message);
