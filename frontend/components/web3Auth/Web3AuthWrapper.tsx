@@ -1,4 +1,5 @@
 import React, { useState, useEffect, ReactNode } from "react";
+import { Web3AuthContext } from "@/context/Web3AuthContext";
 import {
   Button,
   StyleSheet,
@@ -24,17 +25,10 @@ import Web3Auth, {
 } from "@web3auth/react-native-sdk";
 import { EthereumPrivateKeyProvider } from "@web3auth/ethereum-provider";
 
-/* const redirectUrl =
-  //@ts-ignore
-  Constants.appOwnership == AppOwnership.Expo ||
-  //@ts-ignore
-  Constants.appOwnership == AppOwnership.Guest
-    ? Linking.createURL("web3auth", {})
-    : Linking.createURL("web3auth", { scheme: "web3authexpoexample" }); */
 const redirectUrl = Linking.createURL("(tabs)");
 
 const clientId =
-  "BLnM02JkAZmjmyFufReIuTLAublvcp8As2wIcWuRL0xMQu3gkJDGDva0267WP4fFiFDvntycTrXL97Q8jsHC_Fw";
+  "BAWUFTZNHcpFtCg1qS70gkqPNh5v4RGMXGQs79898sjQydka3M-L_tK5klBTJqCX00xJt0VM5L-7ESc95WZzvnM";
 
 const chainConfig = {
   chainNamespace: ChainNamespace.EIP155,
@@ -88,6 +82,13 @@ export function Web3AuthWrapper({ children }: Web3AuthWrapperProps) {
 
   const login = async () => {
     try {
+      console.log("Reinitializing Web3Auth");
+      await web3auth.init();
+      console.log("Web3Auth reinitialized");
+
+      console.log("Login attempt started");
+      console.log("web3auth ready:", web3auth.ready);
+
       if (!web3auth.ready) {
         console.error("Web3auth not initialized");
         return;
@@ -97,20 +98,30 @@ export function Web3AuthWrapper({ children }: Web3AuthWrapperProps) {
         return;
       }
 
-      await web3auth.login({
-        loginProvider: LOGIN_PROVIDER.EMAIL_PASSWORDLESS,
-        extraLoginOptions: {
-          login_hint: email,
-        },
-      });
-
+      console.log("Attempting login with email:", email);
+      try {
+        await web3auth.login({
+          loginProvider: LOGIN_PROVIDER.EMAIL_PASSWORDLESS,
+          extraLoginOptions: {
+            login_hint: email,
+          },
+        });
+      } catch (loginError) {
+        console.error("Web3Auth login error:", loginError);
+        throw loginError;
+      }
       if (web3auth.privKey) {
+        console.log("Setting up provider");
         await ethereumPrivateKeyProvider.setupProvider(web3auth.privKey);
+        console.log("Provider Set up");
         setProvider(ethereumPrivateKeyProvider);
         setLoggedIn(true);
+      } else {
+        console.log("No privKey found after login");
       }
     } catch (e: any) {
-      console.error(e.message);
+      console.error("Login error:", e);
+      console.error("Error stack:", e.stack);
     }
   };
 
@@ -120,11 +131,17 @@ export function Web3AuthWrapper({ children }: Web3AuthWrapperProps) {
       return;
     }
 
+    console.log("Logging out");
     await web3auth.logout();
 
     if (!web3auth.privKey) {
       setProvider(null);
       setLoggedIn(false);
+      console.log("Logged out successfully");
+
+      console.log("Reinitializing web3auth");
+      await web3auth.init();
+      console.log("Web3auth reinitialized");
     }
   };
 
@@ -152,15 +169,14 @@ export function Web3AuthWrapper({ children }: Web3AuthWrapperProps) {
   }
 
   return (
-    <>
+    <Web3AuthContext.Provider value={{ provider }}>
       {children}
-      <Text>{redirectUrl}</Text>
       {loggedIn && (
         <TouchableOpacity style={styles.floatingButton} onPress={logout}>
           <Text style={styles.floatingButtonText}>Logout</Text>
         </TouchableOpacity>
       )}
-    </>
+    </Web3AuthContext.Provider>
   );
 }
 

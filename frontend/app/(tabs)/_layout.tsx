@@ -1,6 +1,6 @@
 import { Tabs } from "expo-router";
 import React from "react";
-import { View, TouchableOpacity, StyleSheet } from "react-native";
+import { View, TouchableOpacity, StyleSheet, SafeAreaView } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 import { Colors } from "@/constants/Colors";
@@ -12,59 +12,75 @@ export default function TabLayout() {
 
   return (
     <Web3AuthWrapper>
-      <Tabs
-        screenOptions={{
-          tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
-          headerShown: false,
-          tabBarStyle: styles.tabBar,
-          tabBarShowLabel: false, // Hide labels for a more minimal look
+      <SafeAreaView
+        style={{
+          flex: 1,
+          backgroundColor: Colors[colorScheme ?? "light"].background,
         }}
       >
-        <Tabs.Screen
-          name="index"
-          options={{
-            title: "Home",
-            tabBarIcon: ({ color, focused }) => (
-              <Ionicons
-                name={focused ? "home" : "home-outline"}
-                size={24}
-                color={color}
-              />
-            ),
-          }}
-        />
-        <Tabs.Screen
-          name="camera"
-          options={{
-            title: "",
-            tabBarButton: ({ onPress }) => (
-              <View style={styles.cameraButtonContainer}>
-                <TouchableOpacity style={styles.cameraButton} onPress={onPress}>
-                  <Ionicons name="camera" color="white" size={30} />
-                </TouchableOpacity>
-              </View>
-            ),
-          }}
-        />
-        <Tabs.Screen
-          name="account"
-          options={{
-            title: "Account",
-            tabBarIcon: ({ color, focused }) => (
-              <Ionicons
-                name={focused ? "person" : "person-outline"}
-                size={24}
-                color={color}
-              />
-            ),
-          }}
-        />
-      </Tabs>
+        <View style={styles.container}>
+          <Tabs
+            screenOptions={{
+              tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
+              headerShown: false,
+              tabBarStyle: styles.tabBar,
+              tabBarShowLabel: false, // Hide labels for a more minimal look
+            }}
+          >
+            <Tabs.Screen
+              name="index"
+              options={{
+                title: "Home",
+                tabBarIcon: ({ color, focused }) => (
+                  <Ionicons
+                    name={focused ? "home" : "home-outline"}
+                    size={24}
+                    color={color}
+                  />
+                ),
+              }}
+            />
+            <Tabs.Screen
+              name="camera"
+              options={{
+                title: "",
+                tabBarButton: ({ onPress }) => (
+                  <View style={styles.cameraButtonContainer}>
+                    <TouchableOpacity
+                      style={styles.cameraButton}
+                      onPress={onPress}
+                    >
+                      <Ionicons name="camera" color="white" size={30} />
+                    </TouchableOpacity>
+                  </View>
+                ),
+              }}
+            />
+            <Tabs.Screen
+              name="account"
+              options={{
+                title: "Account",
+                tabBarIcon: ({ color, focused }) => (
+                  <Ionicons
+                    name={focused ? "person" : "person-outline"}
+                    size={24}
+                    color={color}
+                  />
+                ),
+              }}
+            />
+          </Tabs>
+        </View>
+      </SafeAreaView>
     </Web3AuthWrapper>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingTop: 33,
+  },
   tabBar: {
     height: 60,
     paddingBottom: 5,
