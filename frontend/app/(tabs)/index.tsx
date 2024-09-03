@@ -2,6 +2,7 @@ import React from "react";
 import { ScrollView, StyleSheet, SafeAreaView } from "react-native";
 import ImageCard from "@/components/ImageCard";
 import { ImageCardProps } from "@/types";
+import TagSubscription from "@/components/home/tagSubscription";
 
 // Mock data for demonstration
 const mockData = [
@@ -27,6 +28,7 @@ const mockData = [
 const Home: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
+      <TagSubscription />
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {mockData.map((item) => (
           <ImageCard
