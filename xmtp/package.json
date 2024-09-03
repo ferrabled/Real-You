@@ -1,0 +1,23 @@
+{
+  "name": "broadcaster-app",
+  "type": "module",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "tsc",
+    "deploy": "vercel deploy --prod"
+  },
+  "dependencies": {
+    "@vercel/kv": "^2.0.0",
+    "@vercel/node": "^3.2.10",
+    "@xmtp/grpc-api-client": "^0.2.4",
+    "@xmtp/xmtp-js": "^11.5.0",
+    "dotenv": "^16.4.5",
+    "ethers": "^6.11.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.4",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.4",
+    "vercel": "^32.4.1"
+  }
+}
