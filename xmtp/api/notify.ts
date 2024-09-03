@@ -3,6 +3,8 @@ import { Client } from "@xmtp/xmtp-js";
 import { GrpcApiClient } from "@xmtp/grpc-api-client";
 import { Wallet } from "ethers";
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { createConsentProofPayload } from '@xmtp/consent-proof-signature';
+import Long from 'long';
 
 const tagMessages: { [key: string]: string } = {
   "Nature": "A new nature photo has been uploaded to Real You!",
@@ -14,6 +16,18 @@ const tagMessages: { [key: string]: string } = {
   "Art & Fashion": "Get inspired by the latest art & fashion photo on Real You!",
 };
 
+const tagPrivateKeys: { [key: string]: string } = {
+  "Nature": process.env.NATURE_PRIVATE_KEY!,
+  "Food": process.env.FOOD_PRIVATE_KEY!,
+  "Travel": process.env.TRAVEL_PRIVATE_KEY!,
+  "Sports": process.env.SPORTS_PRIVATE_KEY!,
+  "People": process.env.PEOPLE_PRIVATE_KEY!,
+  "Pets": process.env.PETS_PRIVATE_KEY!,
+  "Art & Fashion": process.env.ART_FASHION_PRIVATE_KEY!,
+  // Add a default key for any other tags
+  "default": process.env.DEFAULT_PRIVATE_KEY!,
+};
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'POST') {
     const { tag } = req.body;
@@ -22,25 +36,32 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ error: 'Tag is required' });
     }
 
-    const message = tagMessages[tag] || `A new photo tagged with ${tag} has been uploaded to Real You!`;
+    const message = tagMessages[tag] || `A new photo tagged with ${tag} has been uploaded to Real You. Go check it out!`;
     
-    // Get subscribed addresses
-    const subscribedAddresses = await kv.smembers(`subscriptions:${tag}`);
+    // Get subscribed data
+    const subscribedData = await kv.smembers(`subscriptions:${tag}`);
 
-    // Initialize XMTP client
-    const wallet = new Wallet(process.env.PRIVATE_KEY!);
-    const client = await Client.create(wallet, {
-      apiClientFactory: GrpcApiClient.fromOptions,
-      env: "production",
-    });
+    // Get the private key for the tag
+    const privateKey = tagPrivateKeys[tag] || tagPrivateKeys["default"];
+
+    // Initialize XMTP client with the tag-specific private key
+    const wallet = new Wallet(privateKey);
+    const client = await Client.create(wallet, {env: "production"});
 
     // Send messages
-    for (const address of subscribedAddresses) {
+    for (const data of subscribedData) {
+      const [address, signature, currentTime] = data.split(',');
+      console.log("Data:", data);
+      console.log(data)
+      console.log(`Sending message to: ${address}, signature: ${signature}, currentTime: ${currentTime}`);
       try {
-        //TODO: Add consentProof to the conversation
-        const conversation = await client.conversations.newConversation(address);
+        const conversation = await client.conversations.newConversation(
+          address,
+          undefined,
+          { signature, timestamp: Long.fromString(currentTime), payloadVersion: 1 }
+        );
         await conversation.send(message);
-        console.log(`Sent message to: ${address}`);
+        console.log(`Sent message to: ${address} with signature: ${signature}`);
       } catch (err) {
         console.error(`Error sending message to ${address}:`, err);
       }

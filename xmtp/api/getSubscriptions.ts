@@ -12,8 +12,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     try {
       // Retrieve subscriptions for the given tag
       const subscriptions = await kv.smembers(`subscriptions:${tag}`);
-      
-      return res.status(200).json({ subscriptions });
+      //get only the addresses
+      const addresses = subscriptions.map(sub => sub.split(',')[0]);
+      return res.status(200).json({ addresses });
     } catch (error) {
       console.error('Error retrieving subscriptions:', error);
       return res.status(500).json({ error: 'Failed to retrieve subscriptions' });
