@@ -79,16 +79,15 @@ export default function TabLayout() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 33,
   },
   tabBar: {
     height: 60,
     paddingBottom: 5,
     paddingTop: 5,
-    backgroundColor: "white", // Or use Colors[colorScheme].background for theme support
-    borderTopWidth: 0, // Remove top border for a cleaner look
-    elevation: 8, // Add shadow on Android
-    shadowColor: "#000", // Add shadow on iOS
+    backgroundColor: "white",
+    borderTopWidth: 0,
+    elevation: 8,
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: -4,
