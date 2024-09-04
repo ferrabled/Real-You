@@ -2,7 +2,7 @@ import React from "react";
 import { StyleSheet, ScrollView } from "react-native";
 import { UserPhotoGallery } from "@/components/profile/UserPhotoGallery";
 import { ThemedView } from "@/components/ThemedView";
-import TagSubscription from "@/components/home/tagSubscription";
+import TagSubscription from "@/components/profile/tagSubscription";
 
 export default function AccountScreen() {
   return (
