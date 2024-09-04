@@ -8,9 +8,9 @@ import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import "react-native-reanimated";
+import { Header } from "@/components/Header";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
-import { Web3AuthWrapper } from "../components/web3Auth/Web3AuthWrapper";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -33,15 +33,12 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <Stack>
-        {/* <Web3AuthWrapper> */}
+      <Header />
+
+      <Stack initialRouteName="onboarding">
+        <Stack.Screen name="onboarding" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen
-          name="OnboardingScreen"
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen name="+not-found" options={{ title: "Oops!" }} />
-        {/* </Web3AuthWrapper> */}
+        <Stack.Screen name="LoginTest" options={{ headerShown: false }} />
       </Stack>
     </ThemeProvider>
   );
