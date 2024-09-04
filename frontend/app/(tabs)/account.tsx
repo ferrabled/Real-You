@@ -2,11 +2,13 @@ import React from "react";
 import { StyleSheet, ScrollView } from "react-native";
 import { UserPhotoGallery } from "@/components/profile/UserPhotoGallery";
 import { ThemedView } from "@/components/ThemedView";
+import TagSubscription from "@/components/home/tagSubscription";
 
 export default function AccountScreen() {
   return (
     <ScrollView>
       <ThemedView style={styles.container}>
+        <TagSubscription />
         <UserPhotoGallery />
       </ThemedView>
     </ScrollView>
