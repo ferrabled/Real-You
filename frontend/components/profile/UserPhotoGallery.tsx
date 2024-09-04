@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from "react";
-import { View, StyleSheet, ScrollView } from "react-native";
+import { View, StyleSheet, ScrollView, Dimensions } from "react-native";
 import { ethers } from "ethers";
 import { Web3AuthContext } from "@/context/Web3AuthContext";
 import {
@@ -8,11 +8,18 @@ import {
 } from "@/constants/RealYouContract";
 import { UserPhoto } from "./UserPhoto";
 import { ThemedText } from "../ThemedText";
+import LoadingPhotoGrid from "./LoadingPhotoGrid";
+
+const { width } = Dimensions.get("window");
+const PADDING = 5;
+const GAP = 50;
+const photoSize = (width - 2 * PADDING - GAP) / 2;
 
 export const UserPhotoGallery: React.FC = () => {
   const { provider } = useContext(Web3AuthContext);
   const [userPhotos, setUserPhotos] = useState<any[]>([]);
   const [username, setUsername] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (provider) {
@@ -22,6 +29,7 @@ export const UserPhotoGallery: React.FC = () => {
 
   const fetchUserData = async () => {
     try {
+      setIsLoading(true);
       const ethersProvider = new ethers.BrowserProvider(provider);
       const signer = await ethersProvider.getSigner();
       const contract = new ethers.Contract(
@@ -44,49 +52,72 @@ export const UserPhotoGallery: React.FC = () => {
       setUserPhotos(userPhotos);
     } catch (error) {
       console.error("Error fetching user data:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
+
+  if (isLoading) {
+    return <LoadingPhotoGrid />;
+  }
+
+  if (userPhotos.length === 0) {
+    return (
+      <View style={styles.emptyStateContainer}>
+        <ThemedText style={styles.emptyStateText}>
+          You haven't created any Real You moments yet.
+        </ThemedText>
+        <ThemedText style={styles.emptyStateSubText}>
+          Tap the camera button to capture and share your authentic self!
+        </ThemedText>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
       <ThemedText style={styles.title}>Your Photos</ThemedText>
-      {userPhotos.length > 0 ? (
-        <ScrollView horizontal={true} style={styles.scrollView}>
+      <ScrollView contentContainerStyle={styles.scrollViewContent}>
+        <View style={styles.gallery}>
           {userPhotos.map((photo, index) => (
             <UserPhoto
               key={index}
               ipfsHash={photo.ipfsHash}
               username={username}
+              style={styles.photo}
             />
           ))}
-        </ScrollView>
-      ) : (
-        <View style={styles.emptyStateContainer}>
-          <ThemedText style={styles.emptyStateText}>
-            You haven't created any Real You moments yet.
-          </ThemedText>
-          <ThemedText style={styles.emptyStateSubText}>
-            Tap the camera button to capture and share your authentic self!
-          </ThemedText>
         </View>
-      )}
+      </ScrollView>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    marginVertical: 20,
+    flex: 1,
+    paddingHorizontal: PADDING,
   },
   title: {
     fontSize: 20,
     fontWeight: "bold",
     marginBottom: 10,
   },
-  scrollView: {
+  scrollViewContent: {
+    flexGrow: 1,
+  },
+  gallery: {
     flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+  },
+  photo: {
+    width: photoSize,
+    height: photoSize,
+    marginBottom: 10,
   },
   emptyStateContainer: {
+    flex: 1,
     alignItems: "center",
     justifyContent: "center",
     padding: 20,
