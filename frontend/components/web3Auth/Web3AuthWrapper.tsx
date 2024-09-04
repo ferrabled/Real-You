@@ -32,10 +32,10 @@ const clientId =
 
 const chainConfig = {
   chainNamespace: ChainNamespace.EIP155,
-  chainId: "0xaa36a7",
-  rpcTarget: "https://rpc.ankr.com/eth_sepolia",
-  displayName: "Ethereum Sepolia Testnet",
-  blockExplorerUrl: "https://sepolia.etherscan.io",
+  chainId: "0xafa",
+  rpcTarget: "https://rpc-quicknode-holesky.morphl2.io/",
+  displayName: "Morph Holesky Testnet",
+  blockExplorerUrl: "https://explorer-holesky.morphl2.io/",
   ticker: "ETH",
   tickerName: "Ethereum",
   decimals: 18,

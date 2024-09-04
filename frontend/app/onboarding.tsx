@@ -5,43 +5,43 @@ import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { Ionicons } from "@expo/vector-icons";
 
-export default function OnboardingScreen() {
+export default function Onboarding() {
   const router = useRouter();
 
-  const handleGetStarted = () => {
-    console.log("handleGetStarted");
-    router.replace("/LoginTest");
+  const handleLogin = () => {
+    console.log("handleLogin");
+    router.replace("/(tabs)"); // Navigate to the main app (tabs)
   };
 
-  /* const handleGetStarted2 = () => {
-    console.log("handleGetStarted2");
-    router.replace("/Web3AuthApp");
-  }; */
+  const handleSignUp = () => {
+    console.log("handleSignUp");
+    router.push("/SignUp"); // Navigate to the LoginTest page
+  };
 
   return (
     <ThemedView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Image
-          source={require("../assets/images/real-you.jpg")}
+          source={require("@/assets/images/real-you.jpg")}
           style={styles.logo}
         />
         <ThemedText type="title" style={styles.title}>
           Welcome to Real You
         </ThemedText>
         <ThemedText style={styles.description}>
-          Discover the power of authentic connections and meaningful
+          Join our community of authentic connections and meaningful
           interactions.
         </ThemedText>
         <View style={styles.featureContainer}>
           <FeatureItem
-            icon="camera"
-            title="Capture Moments"
-            description="Share your real-time experiences with friends and family."
+            icon="person-add"
+            title="Create Your Profile"
+            description="Set up your unique identity in the Real You community."
           />
           <FeatureItem
-            icon="people"
-            title="Connect Authentically"
-            description="Build genuine relationships without filters or pretense."
+            icon="camera"
+            title="Share Authentic Moments"
+            description="Capture and share real-time experiences with your network."
           />
           <FeatureItem
             icon="shield-checkmark"
@@ -50,8 +50,11 @@ export default function OnboardingScreen() {
           />
         </View>
       </ScrollView>
-      <Button title="Get Started" onPress={handleGetStarted} />
-      {/* <Button title="Get Started 2" onPress={handleGetStarted2} /> */}
+      <View style={styles.buttonContainer}>
+        <Button title="Log In" onPress={handleLogin} />
+        <View style={styles.buttonSpacer} />
+        <Button title="Sign Up" onPress={handleSignUp} />
+      </View>
     </ThemedView>
   );
 }
@@ -117,7 +120,12 @@ const styles = StyleSheet.create({
     marginLeft: 34,
     marginTop: 5,
   },
-  button: {
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
     marginTop: 20,
+  },
+  buttonSpacer: {
+    width: 20,
   },
 });

@@ -9,22 +9,21 @@ import {
   Image,
   Platform,
 } from "react-native";
-import * as FileSystem from "expo-file-system";
 import * as MediaLibrary from "expo-media-library";
+import UploadPrompt from "@/components/camera/UploadPrompt";
 
-export default function App() {
+export default function CameraScreen() {
   const [facing, setFacing] = useState<CameraType>("back");
   const [permission, requestPermission] = useCameraPermissions();
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
+  const [showUploadPrompt, setShowUploadPrompt] = useState(false);
   const cameraRef = useRef<CameraView>(null);
 
   if (!permission) {
-    // Camera permissions are still loading.
     return <View />;
   }
 
   if (!permission.granted) {
-    // Camera permissions are not granted yet.
     return (
       <View style={styles.container}>
         <Text style={styles.message}>
@@ -44,25 +43,33 @@ export default function App() {
       const photo = await cameraRef.current.takePictureAsync();
       setCapturedImage(photo!.uri);
       await savePhoto(photo!.uri);
+      setShowUploadPrompt(true);
     }
   }
 
   async function savePhoto(uri: string) {
     try {
       if (Platform.OS === "web") {
-        // For web, we'll just log the URI and display the image
         console.log("Photo captured (web):", uri);
       } else {
-        // For mobile platforms, save to media library
         console.log("Photo captured (mobile):", uri);
         const asset = await MediaLibrary.createAssetAsync(uri);
         await MediaLibrary.createAlbumAsync("RealYou", asset, false);
         console.log("Photo saved to RealYou album:", asset);
       }
-      // Here you could also save the filename/URI to a database or state management system
     } catch (error) {
       console.error("Error saving photo:", error);
     }
+  }
+
+  function handleUploadComplete() {
+    setShowUploadPrompt(false);
+    setCapturedImage(null);
+  }
+
+  function handleCancel() {
+    setShowUploadPrompt(false);
+    setCapturedImage(null);
   }
 
   return (
@@ -79,6 +86,13 @@ export default function App() {
       </CameraView>
       {capturedImage && (
         <Image source={{ uri: capturedImage }} style={styles.preview} />
+      )}
+      {showUploadPrompt && (
+        <UploadPrompt
+          imageUri={capturedImage}
+          onUploadComplete={handleUploadComplete}
+          onCancel={handleCancel}
+        />
       )}
     </View>
   );
