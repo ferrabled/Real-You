@@ -20,12 +20,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const provider = new ethers.JsonRpcProvider("https://devnet.galadriel.com");
       const wallet = new ethers.Wallet(privateKey, provider);
 
-      // Create contract instance
       const contract = new ethers.Contract(GALADRIEL_ADDRESS, GALADRIEL_ABI, wallet);
       const imageUrl = ('https://ipfs.io/ipfs/' + ipfsUrl);
       console.log("imageUrl: ", imageUrl);
 
-      // Prepare the prompt
       const prompt = `Analyze the following image:
       Provide a JSON response with the following structure:
       {
@@ -41,27 +39,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const chatId = receipt.logs[1].args[1];
       console.log("chatId: ", chatId.toString());
 
-      // Wait for a short period to allow the contract to process the request
-      await new Promise(resolve => setTimeout(resolve, 2000)); // 4 seconds delay
+      await new Promise(resolve => setTimeout(resolve, 8000));
 
-      // Call getMessageHistory to get the result
-      const messages = await contract.getMessageHistory(chatId);
+	  const messages = await contract.getMessageHistory(chatId);
       console.log("messages", messages);
 
-      // Get the last message (assistant's response)
-      const llmResponse = messages[messages.length - 1][1];
+      const llmResponse = messages[messages.length - 1][messages[messages.length - 1].length - 1][0];
       console.log("lastMessage", llmResponse);
 
-      const content = llmResponse[0][1];
+      const content = llmResponse[llmResponse.length - 1];
       console.log("content: ", content);
 
-      // Try to parse the JSON response
       let analysis;
       try {
-        // First, try to parse the entire content as JSON
         analysis = JSON.parse(content);
       } catch (error) {
-        // If parsing fails, try to extract JSON from the content
         const jsonMatch = content.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
           try {
@@ -76,7 +68,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         }
       }
 
-      // Validate the parsed result
       if (!analysis || typeof analysis !== 'object' || 
           !('isPhotoreal' in analysis) || 
           !('photoDescription' in analysis) || 
@@ -84,12 +75,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         throw new Error('Invalid response structure from GPT-4 Vision');
       }
 
-      // Ensure listOfTags is an array
       if (!Array.isArray(analysis.listOfTags)) {
         analysis.listOfTags = [analysis.listOfTags].filter(Boolean);
       }
 
-      // Filter tags to only include valid ones
       const validTags = ["Nature", "Food", "Travel", "Sports", "People", "Pets", "Art & Fashion"];
       analysis.listOfTags = analysis.listOfTags.filter((tag: string) => validTags.includes(tag));
       console.log("PHOTO RETURNED: ");
