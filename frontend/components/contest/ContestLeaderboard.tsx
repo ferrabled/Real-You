@@ -67,8 +67,6 @@ export const ContestLeaderboard: React.FC<ContestLeaderboardProps> = ({
           return entry;
         })
       );
-
-      // Sort the leaderboard by votes in descending order
       formattedLeaderboard.sort((a, b) => b.votes - a.votes);
       console.log("Sorted leaderboard:", formattedLeaderboard);
 
@@ -78,6 +76,10 @@ export const ContestLeaderboard: React.FC<ContestLeaderboardProps> = ({
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const shortenAddress = (address: string) => {
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
   };
 
   if (isLoading) {
@@ -94,7 +96,9 @@ export const ContestLeaderboard: React.FC<ContestLeaderboardProps> = ({
             <IPFSImage ipfsHash={item.ipfsHash} style={styles.thumbnail} />
             <View style={styles.itemDetails}>
               <ThemedText style={styles.username}>{item.username}</ThemedText>
-              <ThemedText style={styles.address}>{item.owner}</ThemedText>
+              <ThemedText style={styles.address}>
+                {shortenAddress(item.owner)}
+              </ThemedText>
               <ThemedText style={styles.votes}>
                 Votes: {item.votes === 0 ? "No votes" : item.votes}
               </ThemedText>

@@ -1,7 +1,17 @@
 import React from "react";
-import { Modal, View, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  Modal,
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Dimensions,
+} from "react-native";
 import { ThemedText } from "../ThemedText";
 import IPFSImage from "../profile/IPFSImage";
+
+const { width } = Dimensions.get("window");
+const PADDING = 20;
+const imageWidth = width * 0.8;
 
 interface VoteConfirmationModalProps {
   isVisible: boolean;
@@ -34,9 +44,17 @@ export const VoteConfirmationModal: React.FC<VoteConfirmationModalProps> = ({
             Do you want to vote for this photo?
           </ThemedText>
           <IPFSImage ipfsHash={photo.ipfsHash} style={styles.image} />
-          <ThemedText style={styles.username}>{photo.username}</ThemedText>
+          <View style={styles.usernameContainer}>
+            <ThemedText style={styles.preusername}>
+              📸 Real You moment by:
+            </ThemedText>
+            <ThemedText style={styles.username}>{photo.username}</ThemedText>
+          </View>
           <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.button} onPress={onClose}>
+            <TouchableOpacity
+              style={[styles.button, styles.cancelButton]}
+              onPress={onClose}
+            >
               <ThemedText style={styles.buttonText}>Cancel</ThemedText>
             </TouchableOpacity>
             <TouchableOpacity
@@ -62,29 +80,35 @@ const styles = StyleSheet.create({
   modalContent: {
     backgroundColor: "white",
     borderRadius: 10,
-    padding: 20,
+    padding: PADDING,
     alignItems: "center",
-    width: "80%",
+    width: "90%",
+    maxWidth: 400,
   },
   title: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: "bold",
     marginBottom: 10,
   },
   message: {
-    fontSize: 16,
+    fontSize: 18,
     marginBottom: 15,
     textAlign: "center",
   },
   image: {
-    width: 200,
-    height: 200,
+    width: imageWidth,
+    height: imageWidth,
     borderRadius: 10,
     marginBottom: 10,
   },
+  preusername: {
+    fontSize: 18,
+    marginBottom: 20,
+  },
   username: {
-    fontSize: 16,
-    marginBottom: 15,
+    fontWeight: "bold",
+    fontSize: 18,
+    marginBottom: 20,
   },
   buttonContainer: {
     flexDirection: "row",
@@ -92,16 +116,25 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   button: {
-    padding: 10,
+    padding: 15,
     borderRadius: 5,
-    width: "45%",
+    width: "48%",
     alignItems: "center",
   },
   confirmButton: {
     backgroundColor: "#4CAF50",
   },
+  cancelButton: {
+    backgroundColor: "#f44336",
+  },
+  usernameContainer: {
+    flexDirection: "row",
+    gap: 10,
+    justifyContent: "flex-start",
+  },
   buttonText: {
     color: "white",
     fontWeight: "bold",
+    fontSize: 16,
   },
 });
