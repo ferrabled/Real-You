@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@ethersproject/shims": "^5.7.0",
+    "@ethsign/sp-sdk": "^0.7.3",
     "@expo/vector-icons": "^14.0.2",
     "@react-navigation/native": "^6.0.2",
     "@web3auth/ethereum-provider": "^8.6.2",

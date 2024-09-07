@@ -8,6 +8,8 @@ import {
 } from "@/constants/RealYouContract";
 import ImageCard from "./ImageCard";
 import { ThemedText } from "../ThemedText";
+import VerificationBadge from "./VerificationBadge";
+import { IndexService } from "@ethsign/sp-sdk";
 
 const { width } = Dimensions.get("window");
 const PADDING = 10;
@@ -18,6 +20,8 @@ interface Photo {
   owner: string;
   username: string;
   timestamp: number;
+  isVerified: boolean;
+  attestationLink: string | null;
 }
 
 export const ImageGallery: React.FC = () => {
@@ -43,20 +47,75 @@ export const ImageGallery: React.FC = () => {
       const photoCount = await contract.photoCount();
       const fetchedPhotos = await contract.getAllPhotos(1, photoCount);
 
+      const indexService = new IndexService("testnet");
+      const res = await indexService.queryAttestationList({
+        schemaId: "onchain_evm_11155111_0x82",
+        attester: "0x66E30Ce4FB76f08C431080B1C1C95d97311a4526",
+        page: 1,
+        mode: "onchain",
+      });
+
       const formattedPhotos = await Promise.all(
         fetchedPhotos.map(async (photo: any, index: number) => {
           const userProfile = await contract.getUserProfile(photo[0]);
+          console.log("userProfile", userProfile);
+          let ipfsHash = photo[1];
+          let isVerified = false;
+          let attestationLink = null;
+
+          if (res && res.rows) {
+            for (const att of res.rows) {
+              let parsedData: any = {};
+              if (att.mode === "onchain") {
+                try {
+                  const hexString: string = att.data.startsWith("0x")
+                    ? att.data.slice(2)
+                    : att.data;
+                  const [photoHash, photoId, isVerified] =
+                    ethers.AbiCoder.defaultAbiCoder().decode(
+                      ["string", "uint256", "bool"],
+                      `0x${hexString}`
+                    );
+
+                  parsedData = {
+                    PhotoHash: photoHash,
+                    PhotoId: photoId.toString(),
+                    IsVerified: isVerified,
+                  };
+                } catch (error) {
+                  console.error(
+                    "Error decoding on-chain attestation data:",
+                    error
+                  );
+                }
+              }
+              console.log("Parsed attestation data:", parsedData);
+
+              if (parsedData.PhotoHash === ipfsHash) {
+                isVerified = parsedData.IsVerified;
+                attestationLink = `https://testnet-scan.sign.global/attestation/onchain_evm_11155111_${att.attestationId}`;
+                ipfsHash = parsedData.PhotoHash;
+                break;
+              } else {
+                console.log("TEST del pareja");
+                console.log("ipfsHash", ipfsHash);
+                console.log("parsedData.PhotoId", parsedData.PhotoId);
+                console.log("No matching attestation found");
+              }
+            }
+          }
           return {
             id: index.toString(),
             owner: photo[0],
-            ipfsHash: photo[1],
+            ipfsHash,
             timestamp: Number(photo[2]),
             username: userProfile.username || "Unknown User",
+            isVerified,
+            attestationLink,
           };
         })
       );
 
-      // Sort the formattedPhotos in descending order based on timestamp
       const sortedPhotos = formattedPhotos.sort(
         (a, b) => b.timestamp - a.timestamp
       );
@@ -81,12 +140,18 @@ export const ImageGallery: React.FC = () => {
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.gallery}>
         {photos.map((photo) => (
-          <ImageCard
-            key={photo.id}
-            imageUrl={`https://ipfs.io/ipfs/${photo.ipfsHash}`}
-            username={photo.username}
-            timestamp={new Date(photo.timestamp * 1000).toLocaleString()}
-          />
+          <View key={photo.id} style={styles.imageContainer}>
+            <ImageCard
+              key={photo.id}
+              imageUrl={`https://ipfs.io/ipfs/${photo.ipfsHash}`}
+              username={photo.username}
+              timestamp={new Date(photo.timestamp * 1000).toLocaleString()}
+            />
+            <VerificationBadge
+              isVerified={photo.isVerified}
+              attestationLink={photo.attestationLink}
+            />
+          </View>
         ))}
       </View>
     </ScrollView>
@@ -113,6 +178,9 @@ const styles = StyleSheet.create({
   emptyStateText: {
     fontSize: 18,
     textAlign: "center",
+  },
+  imageContainer: {
+    position: "relative",
   },
 });
 
