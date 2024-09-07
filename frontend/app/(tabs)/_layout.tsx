@@ -69,6 +69,12 @@ export default function TabLayout() {
                 ),
               }}
             />
+            <Tabs.Screen
+              name="Contest"
+              options={{
+                href: null, // This hides the tab from the tab bar
+              }}
+            />
           </Tabs>
         </View>
       </SafeAreaView>

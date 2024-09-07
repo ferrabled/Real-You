@@ -1,10 +1,12 @@
 import React from "react";
-import { StyleSheet, SafeAreaView } from "react-native";
+import { StyleSheet, SafeAreaView, Text } from "react-native";
 import ImageGallery from "@/components/home/ImageGallery";
+import ContestBanner from "@/components/home/ContestBanner";
 
 const Home: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
+      <ContestBanner />
       <ImageGallery />
     </SafeAreaView>
   );
