@@ -56,7 +56,12 @@ export const ImageGallery: React.FC = () => {
         })
       );
 
-      setPhotos(formattedPhotos);
+      // Sort the formattedPhotos in descending order based on timestamp
+      const sortedPhotos = formattedPhotos.sort(
+        (a, b) => b.timestamp - a.timestamp
+      );
+
+      setPhotos(sortedPhotos);
     } catch (error) {
       console.error("Error fetching photos:", error);
     }

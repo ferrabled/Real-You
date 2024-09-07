@@ -1,5 +1,13 @@
 import React, { useContext, useState, useEffect } from "react";
-import { View, Text, StyleSheet, Button, Alert, Linking } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Button,
+  Alert,
+  Linking,
+  TextInput,
+} from "react-native";
 import { Web3AuthWrapper } from "@/components/web3Auth/Web3AuthWrapper";
 import { Web3AuthContext } from "@/context/Web3AuthContext";
 import { ethers } from "ethers";
@@ -11,12 +19,18 @@ import {
 function LoginTestContent() {
   const { provider } = useContext(Web3AuthContext);
   const [isRegistering, setIsRegistering] = useState(false);
+  const [username, setUsername] = useState("");
 
   useEffect(() => {}, [provider]);
 
   const finishRegistration = async () => {
     if (!provider) {
       Alert.alert("Error", "Web3 provider not available");
+      return;
+    }
+
+    if (!username.trim()) {
+      Alert.alert("Error", "Please enter a username");
       return;
     }
 
@@ -37,15 +51,14 @@ function LoginTestContent() {
 
       Alert.alert(
         "Confirm Registration",
-        "Do you want to complete your registration on the blockchain?",
+        `Do you want to complete your registration on the blockchain with the username "${username}"?`,
         [
           { text: "Cancel", style: "cancel" },
           {
             text: "Confirm",
             onPress: async () => {
-              console.log("FUNCTIONS", contract.getFunction("registerUser"));
               try {
-                const tx = await contract.registerUser("TEST");
+                const tx = await contract.registerUser(username);
                 const receipt = await tx.wait();
                 const txHash = receipt.transactionHash;
                 const explorerUrl = `https://sepolia.etherscan.io/tx/${txHash}`; // Assuming Sepolia network, change if different
@@ -84,11 +97,18 @@ function LoginTestContent() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Logged In</Text>
+      <Text style={styles.text}>Set Your Username</Text>
+      <TextInput
+        style={styles.input}
+        onChangeText={setUsername}
+        value={username}
+        placeholder="Enter your username"
+        autoCapitalize="none"
+      />
       <Button
         title="Finish Registration"
         onPress={finishRegistration}
-        disabled={isRegistering}
+        disabled={isRegistering || !username.trim()}
       />
     </View>
   );
@@ -112,5 +132,13 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 20,
+  },
+  input: {
+    width: "80%",
+    height: 40,
+    borderColor: "gray",
+    borderWidth: 1,
+    marginBottom: 20,
+    paddingHorizontal: 10,
   },
 });

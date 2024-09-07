@@ -14,9 +14,12 @@ const IPFSImage: React.FC<IPFSImageProps> = ({ ipfsHash, style }) => {
     const fetchImage = async () => {
       try {
         console.log("Fetching image from IPFS:", ipfsHash);
-        // Construct the IPFS gateway URL
-        const gatewayUrl = `https://ipfs.io/ipfs/${ipfsHash}`;
-
+        let gatewayUrl = "";
+        if (ipfsHash.startsWith("https://ipfs.io/ipfs/")) {
+          gatewayUrl = ipfsHash;
+        } else {
+          gatewayUrl = `https://ipfs.io/ipfs/${ipfsHash}`;
+        }
         // Fetch the image to check if it's available
         const response = await fetch(gatewayUrl);
         if (response.ok) {

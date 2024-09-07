@@ -172,9 +172,11 @@ export function Web3AuthWrapper({ children }: Web3AuthWrapperProps) {
     <Web3AuthContext.Provider value={{ provider }}>
       {children}
       {loggedIn && (
-        <TouchableOpacity style={styles.floatingButton} onPress={logout}>
+        <>
+          {/* <TouchableOpacity style={styles.floatingButton} onPress={logout}>
           <Text style={styles.floatingButtonText}>Logout</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
+        </>
       )}
     </Web3AuthContext.Provider>
   );
