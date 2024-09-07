@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Image,
   Dimensions,
+  Linking,
 } from "react-native";
 import * as FileSystem from "expo-file-system";
 import { ethers } from "ethers";
@@ -37,19 +38,26 @@ const UploadPrompt: React.FC<UploadPromptProps> = ({
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(
     null
   );
-  const [hash, setHash] = useState(null);
+  const [hash, setHash] = useState<string | null>(null);
+  const [transactionHash, setTransactionHash] = useState<string | null>(null);
   const { provider } = useContext(Web3AuthContext);
-  const [step, setStep] = useState<"initial" | "analysis" | "results">(
-    "initial"
-  );
+  const [step, setStep] = useState<
+    "initial" | "analysis" | "results" | "success"
+  >("initial");
+
+  useEffect(() => {
+    if (imageUri) {
+      uploadToPinata(imageUri);
+    }
+  }, [imageUri]);
 
   async function uploadToPinata(uri: string) {
     try {
+      setIsUploading(true);
       const file = await FileSystem.readAsStringAsync(uri, {
         encoding: "base64",
       });
       console.log("Uploading to Pinata");
-      console.log(EXPO_PUBLIC_PINATA_JWT);
       const url = "https://api.pinata.cloud/pinning/pinFileToIPFS";
       const data = new FormData();
       data.append("file", {
@@ -69,10 +77,10 @@ const UploadPrompt: React.FC<UploadPromptProps> = ({
       const responseData = await response.json();
       console.log(responseData);
       setHash(responseData.IpfsHash);
-      return responseData.IpfsHash;
     } catch (error) {
       console.error("Error uploading to Pinata:", error);
-      return null;
+    } finally {
+      setIsUploading(false);
     }
   }
 
@@ -113,9 +121,14 @@ const UploadPrompt: React.FC<UploadPromptProps> = ({
       );
       console.log("Uploading to contract");
       console.log(ipfsHash);
+      const photoIdBigInt = await contract.photoCount();
+      const photoId = Number(photoIdBigInt); // Convert BigInt to number
+      console.log("photoId: ", photoId);
+
       const tx = await contract.uploadPhoto(ipfsHash);
       await tx.wait();
       console.log("Photo uploaded to contract successfully");
+      return photoId;
     } catch (error) {
       console.error("Error uploading to contract:", error);
       throw error;
@@ -123,15 +136,12 @@ const UploadPrompt: React.FC<UploadPromptProps> = ({
   }
 
   async function handleAnalyze() {
-    if (imageUri) {
+    if (hash) {
       setIsUploading(true);
       try {
-        const hash = await uploadToPinata(imageUri);
-        if (hash) {
-          const analysis = await analyzeImage(hash);
-          setAnalysisResult({ ...analysis, ipfsHash: hash });
-          setStep("analysis");
-        }
+        const analysis = await analyzeImage(hash);
+        setAnalysisResult({ ...analysis, ipfsHash: hash });
+        setStep("analysis");
       } catch (error) {
         console.error("Error during analysis:", error);
         // Handle error (show error message to user)
@@ -145,11 +155,37 @@ const UploadPrompt: React.FC<UploadPromptProps> = ({
     if (analysisResult && hash) {
       setIsUploading(true);
       try {
-        await uploadToContract(hash);
-        onUploadComplete();
+        const photoId = await uploadToContract(hash);
+
+        // New fetch call to create attestation
+        const response = await fetch(
+          "https://real-you-backend.vercel.app/api/createAttestation",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              photoId: photoId,
+              ipfsHash: hash,
+            }),
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to create attestation");
+        }
+
+        const data = await response.json();
+        console.log("Attestation created:", data);
+
+        setTransactionHash(data.transactionHash);
+        setStep("success");
       } catch (error) {
-        console.error("Error uploading to contract:", error);
-        // Handle error (show error message to user)
+        console.error(
+          "Error uploading to contract or creating attestation:",
+          error
+        );
       } finally {
         setIsUploading(false);
       }
@@ -189,19 +225,7 @@ const UploadPrompt: React.FC<UploadPromptProps> = ({
           </>
         )}
 
-        {step === "analysis" && (
-          <>
-            <Text style={styles.title}>Analysis Complete</Text>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => setStep("results")}
-            >
-              <Text style={styles.buttonText}>View Results</Text>
-            </TouchableOpacity>
-          </>
-        )}
-
-        {step === "results" && analysisResult && (
+        {step === "analysis" && analysisResult && (
           <>
             <Text style={styles.title}>Analysis Results</Text>
             <Text style={styles.resultItem}>
@@ -235,6 +259,33 @@ const UploadPrompt: React.FC<UploadPromptProps> = ({
             </View>
           </>
         )}
+
+        {step === "success" && (
+          <>
+            <Text style={styles.successTitle}>Congratulations!</Text>
+            <Text style={styles.successMessage}>
+              You uploaded a new moment to Real You. This photo has been
+              certified through an attestation and also with a transaction into
+              the Morph blockchain.
+            </Text>
+            {
+              <TouchableOpacity
+                onPress={() =>
+                  Linking.openURL(
+                    `https://morphblockchainexplorer.com/tx/${transactionHash}`
+                  )
+                }
+              >
+                <Text style={styles.successLink}>
+                  View Transaction on Explorer
+                </Text>
+              </TouchableOpacity>
+            }
+            <TouchableOpacity style={styles.button} onPress={onUploadComplete}>
+              <Text style={styles.buttonText}>Done</Text>
+            </TouchableOpacity>
+          </>
+        )}
       </View>
     </View>
   );
@@ -263,7 +314,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   preview: {
-    width: modalWidth - 40, // Subtracting padding
+    width: modalWidth - 40,
     height: (modalWidth - 40) / imageAspectRatio,
     borderRadius: 10,
     marginVertical: 15,
@@ -308,6 +359,28 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginVertical: 20,
     textAlign: "center",
+  },
+  successContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  successTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
+  },
+  successMessage: {
+    fontSize: 16,
+    textAlign: "center",
+    marginBottom: 20,
+  },
+  successLink: {
+    fontSize: 16,
+    color: "blue",
+    textDecorationLine: "underline",
+    marginBottom: 20,
   },
 });
 
