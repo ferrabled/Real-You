@@ -1,6 +1,6 @@
 # Real You: Authentic Moments, Genuine Connections
 
-![Real You Logo](path/to/logo.png)
+![Real You Logo](frontend/assets/images/iOS.png)
 
 Real You is a revolutionary social media app that prioritizes authenticity and genuine interactions. In a world saturated with edited and AI-generated content, Real You stands out by ensuring that every shared moment is real, unfiltered, and captured in the present.
 
