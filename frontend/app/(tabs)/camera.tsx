@@ -55,9 +55,6 @@ export default function CameraScreen() {
         console.log("Photo captured (web):", uri);
       } else {
         console.log("Photo captured (mobile):", uri);
-        //const asset = await MediaLibrary.createAssetAsync(uri);
-        //await MediaLibrary.createAlbumAsync("RealYou", asset, false);
-        //console.log("Photo saved to RealYou album:", asset);
       }
     } catch (error) {
       console.error("Error saving photo:", error);
@@ -88,11 +85,9 @@ export default function CameraScreen() {
               color="rgba(255, 255, 255, 0.7)"
             />
           </TouchableOpacity>
-          <View style={styles.cameraButtonContainer}>
-            <TouchableOpacity style={styles.cameraButton} onPress={takePicture}>
-              <Ionicons name="camera" color="white" size={30} />
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity style={styles.cameraButton} onPress={takePicture}>
+            <Ionicons name="camera" color="white" size={30} />
+          </TouchableOpacity>
         </View>
       </CameraView>
       {showUploadPrompt && (
@@ -120,38 +115,19 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flex: 1,
     flexDirection: "row",
-    justifyContent: "center",
+    justifyContent: "space-between",
     alignItems: "flex-end",
     paddingBottom: 20,
+    paddingHorizontal: 20,
   },
   flipButton: {
-    position: "absolute",
-    left: 20,
-    bottom: 40,
     padding: 10,
-  },
-  cameraButtonContainer: {
-    position: "absolute",
-    bottom: 20,
-    left: 200,
-    right: 0,
-    alignItems: "center",
-    zIndex: 1000,
+    backgroundColor: "rgba(0, 0, 0, 0.3)",
+    borderRadius: 50,
   },
   cameraButton: {
-    width: 90,
-    height: 90,
-    borderRadius: 35,
-    backgroundColor: Colors.light.tint,
-    justifyContent: "center",
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    padding: 10,
+    backgroundColor: "rgba(0, 0, 0, 0.3)",
+    borderRadius: 50,
   },
 });

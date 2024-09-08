@@ -97,9 +97,6 @@ export const ImageGallery: React.FC = () => {
                 ipfsHash = parsedData.PhotoHash;
                 break;
               } else {
-                console.log("TEST del pareja");
-                console.log("ipfsHash", ipfsHash);
-                console.log("parsedData.PhotoId", parsedData.PhotoId);
                 console.log("No matching attestation found");
               }
             }

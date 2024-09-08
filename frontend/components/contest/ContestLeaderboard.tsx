@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     marginBottom: 10,
-    textAlign: "center",
+    textAlign: "left",
   },
   listContainer: {
     paddingBottom: 20,

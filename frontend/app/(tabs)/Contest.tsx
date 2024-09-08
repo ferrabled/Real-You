@@ -184,7 +184,7 @@ export const Contest: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    paddingTop: 20,
+    paddingTop: 19,
     paddingHorizontal: 10,
   },
 });

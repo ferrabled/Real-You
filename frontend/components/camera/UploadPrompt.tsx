@@ -122,10 +122,13 @@ const UploadPrompt: React.FC<UploadPromptProps> = ({
       console.log("Uploading to contract");
       console.log(ipfsHash);
       const photoIdBigInt = await contract.photoCount();
-      const photoId = Number(photoIdBigInt); // Convert BigInt to number
+      const photoId = Number(photoIdBigInt);
       console.log("photoId: ", photoId);
 
-      const tx = await contract.uploadPhoto(ipfsHash);
+      const tx = await contract.uploadPhoto(ipfsHash, {
+        gasPrice: ethers.parseUnits("0.3", "gwei"),
+        gasLimit: 151384,
+      });
       await tx.wait();
       console.log("Photo uploaded to contract successfully");
       return photoId;
