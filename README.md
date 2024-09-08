@@ -10,6 +10,7 @@ Real You is a revolutionary social media app that prioritizes authenticity and g
 
 ## Table of Contents
 
+- [Deployments](#deployments)
 - [Overview](#overview)
 - [Key Features](#key-features)
 - [How It Works](#how-it-works)
@@ -18,6 +19,13 @@ Real You is a revolutionary social media app that prioritizes authenticity and g
 - [Architecture](#architecture)
 - [Technical Stack](#technical-stack)
 - [Future Improvements](#future-improvements)
+
+## Deployments
+Here are the deployments that we made to the blockchain:
+- [MORPH deployment](https://explorer-holesky.morphl2.io/address/0x17b8D21d322C250607ee0DA92f4a4ECA094bf9E0) - 0x17b8D21d322C250607ee0DA92f4a4ECA094bf9E0
+- [SIGN PROTOCOL schema](https://testnet-scan.sign.global/schema/onchain_evm_11155111_0x82) - onchain_evm_11155111_0x82
+- [GALADRIEL deployment](https://explorer.galadriel.com/address/0xF6b705595E95c8D94E22B38570e79f8BaFa39558) - 0xF6b705595E95c8D94E22B38570e79f8BaFa39558
+- XMTP consists in one EOA for each of the tags available in Real You: Nature, Food, Travel, Sports, People, Pets, Art & Fashion. The notification system chooses one account depending on the tag.
 
 ## Overview
 
@@ -114,9 +122,8 @@ We're constantly working to improve Real You. Some areas we're exploring:
 
 1. **Enhanced Privacy Features**: Implementing advanced encryption for user data.
 2. **Decentralized Identity**: Integrating DIDs for user authentication and profile management.
-3. **Community Governance**: Introducing a DAO structure for platform decisions.
+3. **Hardware based attestations**: To permit new devices, as cameras could use Real You platform.
 4. **Cross-Chain Compatibility**: Expanding blockchain support beyond Morph.
-5. **AR Filters**: Introducing augmented reality filters that preserve photo authenticity.
 
 ---
 
