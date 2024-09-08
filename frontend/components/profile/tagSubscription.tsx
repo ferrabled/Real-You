@@ -14,6 +14,7 @@ import {
   createConsentMessage,
   createConsentProofPayload,
 } from "@xmtp/consent-proof-signature";
+import { ThemedText } from "../ThemedText";
 
 const tags = [
   "Nature",
@@ -30,6 +31,7 @@ const TagSubscription: React.FC = () => {
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { provider } = useContext(Web3AuthContext);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   useEffect(() => {
     fetchSubscribedTags();
@@ -50,7 +52,7 @@ const TagSubscription: React.FC = () => {
 
         if (response.ok) {
           const data = await response.json();
-          console.log("Fetched data:", data); // For debugging
+          console.log("Fetched data:", data);
           if (Array.isArray(data.subscriptions)) {
             setSubscribedTags(data.subscriptions);
           } else {
@@ -164,6 +166,10 @@ const TagSubscription: React.FC = () => {
     }
   };
 
+  const toggleExpand = () => {
+    setIsExpanded(!isExpanded);
+  };
+
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
@@ -174,39 +180,47 @@ const TagSubscription: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.tagContainer}>
-        {tags.map((tag) => (
-          <TouchableOpacity
-            key={tag}
-            style={[
-              styles.tag,
-              subscribedTags.includes(tag) && styles.subscribedTag,
-              selectedTag === tag && styles.selectedTag,
-            ]}
-            onPress={() => handleTagPress(tag)}
-            disabled={subscribedTags.includes(tag)}
-          >
-            <Text
-              style={[
-                styles.tagText,
-                (subscribedTags.includes(tag) || selectedTag === tag) &&
-                  styles.selectedTagText,
-              ]}
+      <TouchableOpacity onPress={toggleExpand} style={styles.titleContainer}>
+        <ThemedText style={styles.title}>Tag Subscriptions</ThemedText>
+        <Text style={styles.expandIcon}>{isExpanded ? "▲" : "▼"}</Text>
+      </TouchableOpacity>
+      {isExpanded && (
+        <View>
+          <View style={styles.tagContainer}>
+            {tags.map((tag) => (
+              <TouchableOpacity
+                key={tag}
+                style={[
+                  styles.tag,
+                  subscribedTags.includes(tag) && styles.subscribedTag,
+                  selectedTag === tag && styles.selectedTag,
+                ]}
+                onPress={() => handleTagPress(tag)}
+                disabled={subscribedTags.includes(tag)}
+              >
+                <Text
+                  style={[
+                    styles.tagText,
+                    (subscribedTags.includes(tag) || selectedTag === tag) &&
+                      styles.selectedTagText,
+                  ]}
+                >
+                  {tag}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+          {selectedTag && (
+            <TouchableOpacity
+              style={styles.subscribeButton}
+              onPress={handleSubscribe}
             >
-              {tag}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-      {selectedTag && (
-        <TouchableOpacity
-          style={styles.subscribeButton}
-          onPress={handleSubscribe}
-        >
-          <Text style={styles.subscribeButtonText}>
-            Subscribe to {selectedTag}
-          </Text>
-        </TouchableOpacity>
+              <Text style={styles.subscribeButtonText}>
+                Subscribe to {selectedTag}
+              </Text>
+            </TouchableOpacity>
+          )}
+        </View>
       )}
     </View>
   );
@@ -214,11 +228,28 @@ const TagSubscription: React.FC = () => {
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 20,
+    marginBottom: 21,
+  },
+  titleContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#e0e0e0",
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: "bold",
+  },
+  expandIcon: {
+    fontSize: 18,
+    color: "#007AFF",
   },
   tagContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
+    marginTop: 10,
     marginBottom: 10,
   },
   tag: {

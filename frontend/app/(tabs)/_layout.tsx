@@ -1,4 +1,4 @@
-import { Tabs } from "expo-router";
+import { Tabs, usePathname } from "expo-router";
 import React from "react";
 import { View, TouchableOpacity, StyleSheet, SafeAreaView } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
@@ -9,6 +9,7 @@ import { Web3AuthWrapper } from "@/components/web3Auth/Web3AuthWrapper";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const pathname = usePathname();
 
   return (
     <Web3AuthWrapper>
@@ -44,16 +45,17 @@ export default function TabLayout() {
               name="camera"
               options={{
                 title: "",
-                tabBarButton: ({ onPress }) => (
-                  <View style={styles.cameraButtonContainer}>
-                    <TouchableOpacity
-                      style={styles.cameraButton}
-                      onPress={onPress}
-                    >
-                      <Ionicons name="camera" color="white" size={30} />
-                    </TouchableOpacity>
-                  </View>
-                ),
+                tabBarButton: ({ onPress }) =>
+                  pathname !== "/camera" ? (
+                    <View style={styles.cameraButtonContainer}>
+                      <TouchableOpacity
+                        style={styles.cameraButton}
+                        onPress={onPress}
+                      >
+                        <Ionicons name="camera" color="white" size={30} />
+                      </TouchableOpacity>
+                    </View>
+                  ) : null,
               }}
             />
             <Tabs.Screen
@@ -72,7 +74,7 @@ export default function TabLayout() {
             <Tabs.Screen
               name="Contest"
               options={{
-                href: null, // This hides the tab from the tab bar
+                href: null,
               }}
             />
           </Tabs>

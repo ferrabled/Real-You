@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, Text } from "react-native";
 import { ThemedText } from "../ThemedText";
 
 interface ContestTopicProps {
@@ -23,26 +23,40 @@ export const ContestTopic: React.FC<ContestTopicProps> = ({
 
   return (
     <View style={styles.container}>
-      <ThemedText style={styles.topic}>Topic: {topic}</ThemedText>
-      <ThemedText style={styles.timeLeft}>{formatTimeLeft(endTime)}</ThemedText>
+      <Text style={styles.topic}>{topic}</Text>
+      <View style={styles.timeLeftContainer}>
+        <ThemedText style={styles.timeLeft}>
+          🕰️ {formatTimeLeft(endTime)}
+        </ThemedText>
+        <ThemedText style={styles.timeLeft}>🏆 10 reputation points</ThemedText>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    alignItems: "center",
+    justifyContent: "center",
     backgroundColor: "#f0f0f0",
     padding: 15,
     borderRadius: 10,
     marginBottom: 20,
   },
   topic: {
-    fontSize: 18,
+    fontSize: 36,
+    fontStyle: "italic",
     fontWeight: "bold",
-    marginBottom: 5,
+    marginBottom: 10,
   },
   timeLeft: {
-    fontSize: 16,
+    fontSize: 18,
     color: "#666",
+  },
+  timeLeftContainer: {
+    paddingHorizontal: 20,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
   },
 });

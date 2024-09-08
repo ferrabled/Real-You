@@ -76,7 +76,9 @@ export const UserPhotoGallery: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <ThemedText style={styles.title}>Your Photos</ThemedText>
+      <View style={styles.titleContainer}>
+        <ThemedText style={styles.title}>Your Photos</ThemedText>
+      </View>
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
         <View style={styles.gallery}>
           {userPhotos.map((photo, index) => (
@@ -96,12 +98,19 @@ export const UserPhotoGallery: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: PADDING,
+  },
+  titleContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#e0e0e0",
+    marginBottom: 20,
   },
   title: {
     fontSize: 20,
     fontWeight: "bold",
-    marginBottom: 10,
   },
   scrollViewContent: {
     flexGrow: 1,
